@@ -1,10 +1,22 @@
+version: '3.8'
+
 services:
   web:
-    build: .
-    ports:
-      - "5000:5000"
+    image: ${DOCKERHUB_USERNAME}/myflask:latest
+    build: null
     environment:
-      - FLASK_ENV=development
-    # (선택) 코드 변경 시 자동 반영하려면:
-    # volumes:
-    #   - .:/app
+      - FLASK_ENV=production
+    expose:
+      - "5000"
+    ports: []  # 외부 노출은 nginx가 담당
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d:ro
+    restart: unless-stopped
